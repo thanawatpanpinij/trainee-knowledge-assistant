@@ -5,11 +5,15 @@ const envSchema = z.object({
     .string()
     .min(32, 'AUTH_SECRET is required and should be at least 32 characters'),
   GOOGLE_GENERATIVE_AI_API_KEY: z.string(),
+  DATABASE_URL: z
+    .string()
+    .startsWith('file:', "SQLite DATABASE_URL must start with 'file:'"),
 })
 
 const rawEnv = {
   AUTH_SECRET: process.env['AUTH_SECRET'],
   GOOGLE_GENERATIVE_AI_API_KEY: process.env['GOOGLE_GENERATIVE_AI_API_KEY'],
+  DATABASE_URL: process.env['DATABASE_URL'],
 }
 
 function validateEnv() {
