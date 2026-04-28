@@ -11,10 +11,14 @@ import { NextResponse } from 'next/server'
 const google = createGoogleGenerativeAI({
   apiKey: ENV['GOOGLE_GENERATIVE_AI_API_KEY'],
 })
+export const maxDuration = 15
 
 export async function POST(req: Request) {
   try {
-    // 1. ยืนยันตัวตนและดึง userId จาก Cookie
+    // 🚨 1. ดึง signal ออกมาจาก Request ทันที เพื่อเอาไว้เช็กสถานะการเชื่อมต่อ
+    const signal = req.signal
+
+    // 2. ยืนยันตัวตนและดึง userId จาก Cookie
     const cookieStore = await cookies()
     const token = cookieStore.get('auth_token')?.value
     if (!token) {
@@ -25,10 +29,10 @@ export async function POST(req: Request) {
     const verified = await jwtVerify(token, getJwtSecretKey())
     const userId = verified.payload['userId'] as string
 
-    // 2. รับข้อมูลข้อความ และ chatId จากหน้าบ้าน
+    // 3. รับข้อมูลข้อความ และ chatId จากหน้าบ้าน
     const { messages, chatId } = await req.json()
 
-    // 3. จัดการห้องแชท (Chat Session)
+    // 4. จัดการห้องแชท (Chat Session)
     let currentChatId = chatId
 
     // ดึงข้อความล่าสุดที่ User เพิ่งพิมพ์มา
@@ -60,12 +64,20 @@ export async function POST(req: Request) {
       },
     })
 
-    // 5. เรียกใช้ Gemini และ Streaming
+    // 🚨 6. ตรวจสอบว่า Client ตัดสายไปหรือยัง ก่อนที่จะส่ง Request ไปกวนใจ AI
+    if (signal.aborted) {
+      console.log('🚫 Client ตัดการเชื่อมต่อไปแล้ว ยกเลิกการเรียก AI!')
+      // โยน Error ออกไปเพื่อให้เข้าบล็อก catch และหยุดการทำงานทันที
+      throw new Error('Client aborted the request')
+    }
+
+    // 7. เรียกใช้ Gemini และ Streaming
     const result = await streamText({
       model: google('gemini-2.5-flash-lite'),
       messages: await convertToModelMessages(messages),
+      abortSignal: signal,
       async onFinish({ text, usage }) {
-        // 6. บันทึกคำตอบของ AI พร้อมกับ Token Usage ลง Database
+        // 8. บันทึกคำตอบของ AI พร้อมกับ Token Usage ลง Database
         await prisma.message.create({
           data: {
             chatId: currentChatId,
@@ -77,14 +89,25 @@ export async function POST(req: Request) {
       },
     })
 
-    // 7. ส่ง Data Stream กลับไปให้ Client
+    // 9. ส่ง Data Stream กลับไปให้ Client
     // ทริค: แนบ chatId กลับไปที่ Header ด้วย เพื่อให้หน้าบ้านรู้ว่ากำลังคุยอยู่ในห้องไหน
     const response = result.toUIMessageStreamResponse()
     response.headers.set('x-chat-id', currentChatId)
-
     return response
-  } catch (error) {
-    console.error('Error in Chat API:', error)
+  } catch (error: unknown) {
+    // 🚨 10. ดักจับ Error ที่เกิดจากการ Abort โดยเฉพาะ เพื่อไม่ให้รก Console ด้วย Error 500
+    if (error instanceof Error) {
+      if (
+        error.message === 'Client aborted the request' ||
+        error.name === 'AbortError'
+      ) {
+        console.log('✅ หยุดการทำงานของ Server สำเร็จอย่างปลอดภัย')
+        // Status 499 คือ Client Closed Request (ผู้ใช้ปิดการเชื่อมต่อ)
+        return new NextResponse('Client Closed Request', { status: 499 })
+      }
+    }
+
+    console.error('Error', error)
     return new NextResponse('Internal Server Error', { status: 500 })
   }
 }

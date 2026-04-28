@@ -8,23 +8,43 @@ export default function ChatPage() {
   const [input, setInput] = useState('')
   const [chatId, setChatId] = useState<string | null>(null)
 
-  const { messages, sendMessage, status } = useChat({
-    // ใช้ DefaultChatTransport ตามที่ Vercel AI แนะนำ
+  const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
       fetch: async (url, options) => {
-        const response = await fetch(url, options)
+        const controller = new AbortController()
+        let isTimeout = false
 
-        // ดึงค่า x-chat-id จาก Header ที่ Backend ส่งมา
-        const returnedChatId = response.headers.get('x-chat-id')
+        const timeoutId = setTimeout(() => {
+          isTimeout = true
+          controller.abort()
+        }, 15000)
 
-        // ถ้ามี ID ส่งกลับมา ให้เก็บลง State ทันที
-        if (returnedChatId) {
-          setChatId((prev) => prev || returnedChatId)
+        if (options?.signal) {
+          options.signal.addEventListener('abort', () => controller.abort())
         }
 
-        return response
+        try {
+          const response = await fetch(url, {
+            ...options,
+            signal: controller.signal,
+          })
+          // ดึงค่า x-chat-id จาก Header ที่ Backend ส่งมา
+          const returnedChatId = response.headers.get('x-chat-id')
+          // ถ้ามี ID ส่งกลับมา ให้เก็บลง State ทันที
+          if (returnedChatId) {
+            setChatId((prev) => prev || returnedChatId)
+          }
+
+          return response
+        } catch (err) {
+          if (isTimeout) {
+            throw new Error('TimeoutError')
+          }
+          throw err
+        } finally {
+          clearTimeout(timeoutId)
+        }
       },
-      // 🎯 แทรก Fetch Middleware เพื่อดักจับ Response Header
     }),
   })
 
@@ -99,6 +119,17 @@ export default function ChatPage() {
             </div>
           </div>
         )}
+
+        {/* 🚨 แสดง Error (รวมถึง Timeout) */}
+        {error && error.message !== 'Failed to fetch' && (
+          <div className='my-4 flex justify-center'>
+            <div className='rounded-lg border border-red-200 bg-red-100 px-4 py-2 text-sm text-red-600'>
+              {error.message === 'TimeoutError'
+                ? 'การเชื่อมต่อขัดข้องหรือใช้เวลานานเกินไป (Timeout) กรุณาลองอีกครั้ง'
+                : `เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง`}
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -114,15 +145,35 @@ export default function ChatPage() {
           onChange={(e) => setInput(e.target.value)}
           disabled={isLoading}
         />
-        <button
-          type='submit'
-          disabled={isLoading || !input.trim()}
-          className='absolute right-2 rounded-full bg-blue-600 p-2 text-white transition-colors hover:bg-blue-700 disabled:bg-gray-300'
-        >
-          <svg viewBox='0 0 24 24' fill='currentColor' className='h-5 w-5'>
-            <path d='M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z' />
-          </svg>
-        </button>
+        {/* สลับปุ่ม Send และ Stop ตามสถานะ isLoading */}
+        {isLoading ? (
+          <button
+            type='button'
+            onClick={() => stop()}
+            className='absolute right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600'
+            title='หยุดการทำงาน'
+          >
+            {/* Icon Stop (สี่เหลี่ยม) */}
+            <svg viewBox='0 0 24 24' fill='currentColor' className='h-5 w-5'>
+              <path
+                fillRule='evenodd'
+                d='M4.5 7.5a3 3 0 0 1 3-3h9a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3v-9Z'
+                clipRule='evenodd'
+              />
+            </svg>
+          </button>
+        ) : (
+          <button
+            type='submit'
+            disabled={!input.trim()}
+            className='absolute right-2 rounded-full bg-blue-600 p-2 text-white transition-colors hover:bg-blue-700 disabled:bg-gray-300'
+          >
+            {/* Icon Send (จรวด/ลูกศร) */}
+            <svg viewBox='0 0 24 24' fill='currentColor' className='h-5 w-5'>
+              <path d='M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z' />
+            </svg>
+          </button>
+        )}
       </form>
     </div>
   )
