@@ -3,8 +3,11 @@
 import { SubmitEvent, useEffect, useRef, useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
+import { useRouter } from 'next/navigation'
 
 export default function ChatPage() {
+  const router = useRouter()
+
   const [input, setInput] = useState('')
   const [chatId, setChatId] = useState<string | null>(null)
   const [totalTokens, setTotalTokens] = useState<number>(0)
@@ -76,6 +79,18 @@ export default function ChatPage() {
     setInput('')
   }
 
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+    } catch (error) {
+      // ต่อให้เน็ตหลุด หรือ API พัง เราก็ไม่สน เพราะเป้าหมายคือการเตะออกจากระบบ
+      console.error('Logout failed silently:', error)
+    } finally {
+      // ใช้ finally เพื่อให้มั่นใจว่าเตะกลับหน้า Login "เสมอ"
+      router.push('/login')
+    }
+  }
+
   return (
     <div className='mx-auto flex h-screen max-w-3xl flex-col bg-gray-50 p-4'>
       <header className='mb-4 border-b border-gray-200 py-4'>
@@ -97,6 +112,27 @@ export default function ChatPage() {
             {totalTokens.toLocaleString()} Tokens / Session
           </div>
         )}
+
+        {/* 🌟 ปุ่ม Logout ใหม่ */}
+        <button
+          onClick={handleLogout}
+          className='flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-200 focus:outline-none'
+        >
+          <svg
+            fill='none'
+            viewBox='0 0 24 24'
+            strokeWidth={1.5}
+            stroke='currentColor'
+            className='h-4 w-4'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              d='M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75'
+            />
+          </svg>
+          Logout
+        </button>
       </header>
 
       {/* พื้นที่แสดงข้อความสนทนา */}
