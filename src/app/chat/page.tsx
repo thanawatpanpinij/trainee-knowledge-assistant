@@ -7,6 +7,7 @@ import { DefaultChatTransport } from 'ai'
 export default function ChatPage() {
   const [input, setInput] = useState('')
   const [chatId, setChatId] = useState<string | null>(null)
+  const [totalTokens, setTotalTokens] = useState<number>(0)
 
   const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
@@ -57,6 +58,16 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  // Fetch tokens ทุกครั้งที่ AI ตอบเสร็จ (isLoading เปลี่ยนจาก true -> false)
+  useEffect(() => {
+    if (chatId && !isLoading) {
+      fetch(`/api/chat/usage?chatId=${chatId}`)
+        .then((res) => res.json())
+        .then((data) => setTotalTokens(data.total))
+        .catch((err) => console.error('Failed to fetch tokens:', err))
+    }
+  }, [chatId, isLoading])
+
   const handleSubmit = (e: SubmitEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
@@ -71,6 +82,21 @@ export default function ChatPage() {
         <h1 className='text-2xl font-bold text-gray-800'>
           Knowledge Assistant
         </h1>
+
+        {/* 🌟 แสดง Badge จำนวน Token รวมของ Session นี้ */}
+        {totalTokens > 0 && (
+          <div className='flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-medium text-blue-600 shadow-sm'>
+            <svg viewBox='0 0 24 24' fill='currentColor' className='h-4 w-4'>
+              <path
+                fillRule='evenodd'
+                d='M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 0 1-.988-1.129c1.454-1.272 3.776-1.272 5.23 0 1.513 1.324 1.519 3.408.02 4.8l-2.268 2.116c-.374.349-.614.832-.68 1.346l-.04.316a.75.75 0 1 1-1.488-.19l.039-.315c.153-.19.349-.49.49.525.75.75 0 0 1 .988.1.988 1.129 1.129.988 1.129-.988Z'
+                clipRule='evenodd'
+              />
+              <path d='M12 19.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z' />
+            </svg>
+            {totalTokens.toLocaleString()} Tokens / Session
+          </div>
+        )}
       </header>
 
       {/* พื้นที่แสดงข้อความสนทนา */}
