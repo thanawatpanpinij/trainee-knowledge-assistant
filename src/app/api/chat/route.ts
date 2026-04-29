@@ -3,8 +3,22 @@ import { withAuth } from '@shared/utils/authWrapper'
 import { ChatService } from '@services/chat.service'
 import { AIService } from '@services/ai.service'
 import { chatRequestSchema } from '@shared/validations'
+import { ChatRepository } from '@lib/db/chat.repository'
 
 export const maxDuration = 15
+
+export const GET = withAuth(async (_req: NextRequest, { userId }) => {
+  try {
+    const chats = await ChatRepository.getUserChatList(userId)
+    return NextResponse.json({ chats })
+  } catch (error: unknown) {
+    console.error('[Chat List API Error]:', error)
+    return NextResponse.json(
+      { error: 'ไม่สามารถโหลดรายชื่อแชตได้' },
+      { status: 500 }
+    )
+  }
+})
 
 export const POST = withAuth(async (req: NextRequest, { userId }) => {
   try {

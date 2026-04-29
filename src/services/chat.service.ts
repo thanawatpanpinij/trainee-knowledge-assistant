@@ -35,4 +35,19 @@ export const ChatService = {
 
     return currentChatId
   },
+
+  async getChatHistory(
+    chatId: string,
+    userId: string
+  ): Promise<UIMessage[] | null> {
+    const messages = await ChatRepository.getMessagesByChatId(chatId, userId)
+    if (!messages) return null
+
+    // แปลง field 'content' ใน DB ให้กลายเป็น 'parts' ส่งให้หน้าบ้าน
+    return messages.map((msg) => ({
+      id: msg.id,
+      role: msg.role as 'user' | 'assistant',
+      parts: [{ type: 'text', text: msg.content }],
+    }))
+  },
 }

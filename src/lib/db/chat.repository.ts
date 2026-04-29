@@ -24,4 +24,32 @@ export const ChatRepository = {
       },
     })
   },
+
+  async getMessagesByChatId(chatId: string, userId: string) {
+    // 1. เช็กความปลอดภัยก่อนว่า Chat นี้เป็นของ User คนนี้จริงๆ
+    const chat = await prisma.chat.findUnique({
+      where: { id: chatId, userId },
+    })
+
+    if (!chat) return null
+
+    // 2. ดึงข้อความทั้งหมดเรียงตามเวลาที่สร้าง
+    return prisma.message.findMany({
+      where: { chatId },
+      orderBy: { createdAt: 'asc' },
+    })
+  },
+
+  // เพิ่มฟังก์ชันดึงรายชื่อแชต (เรียงจากใหม่ไปเก่า)
+  async getUserChatList(userId: string) {
+    return prisma.chat.findMany({
+      where: { userId },
+      orderBy: { updatedAt: 'desc' }, // แชตล่าสุดขึ้นก่อน
+      select: {
+        id: true,
+        title: true,
+        updatedAt: true,
+      },
+    })
+  },
 }
