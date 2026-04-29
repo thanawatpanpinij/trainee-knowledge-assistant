@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     const userId = verified.payload['userId'] as string
 
     // 3. รับข้อมูลข้อความ และ chatId จากหน้าบ้าน
-    const { messages, chatId } = await req.json()
+    const { messages, chatId, fileContext } = await req.json()
 
     // 4. จัดการห้องแชท (Chat Session)
     let currentChatId = chatId
@@ -87,6 +87,9 @@ export async function POST(req: Request) {
           },
         })
       },
+      ...(fileContext && {
+        system: `นี่คือข้อมูลอ้างอิงจากเอกสารที่ผู้ใช้อัปโหลดมา:\n\n${fileContext}\n\nกรุณาใช้ข้อมูลเหล่านี้ประกอบการตอบคำถาม หากคำถามไม่เกี่ยวกับเนื้อหานี้ ให้ตอบตามความรู้ปกติของคุณ`,
+      }),
     })
 
     // 9. ส่ง Data Stream กลับไปให้ Client

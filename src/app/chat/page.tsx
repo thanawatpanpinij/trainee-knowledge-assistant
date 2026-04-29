@@ -13,6 +13,8 @@ export default function ChatPage() {
   const [chatId, setChatId] = useState<string | null>(null)
   const [totalTokens, setTotalTokens] = useState<number>(0)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [fileContext, setFileContext] = useState<string>('')
+  const [isExtracting, setIsExtracting] = useState<boolean>(false)
 
   const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
@@ -77,7 +79,7 @@ export default function ChatPage() {
     e.preventDefault()
     if (!input.trim() || isLoading) return
 
-    sendMessage({ text: input }, { body: { chatId } })
+    sendMessage({ text: input }, { body: { chatId, fileContext } })
     setInput('')
   }
 
@@ -90,6 +92,42 @@ export default function ChatPage() {
     } finally {
       // ใช้ finally เพื่อให้มั่นใจว่าเตะกลับหน้า Login "เสมอ"
       router.push('/login')
+    }
+  }
+
+  const handleFileUpload = async (file: File) => {
+    setSelectedFile(file)
+    setIsExtracting(true)
+    setFileContext('')
+
+    try {
+      // 1. เตรียมข้อมูลแบบ FormData
+      const formData = new FormData()
+      formData.append('file', file)
+
+      // 2. ยิงเข้า API ที่เราเพิ่งสร้าง (เบราว์เซอร์จะจัดการ Header ให้เป๊ะๆ 100%)
+      const res = await fetch('/api/extract', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Extract failed')
+      }
+
+      // 3. เก็บ Text ที่อ่านได้ลง State เตรียมไว้ใช้เป็น Context
+      setFileContext(data.text)
+      console.log('✅ สกัดข้อความสำเร็จ ความยาว:', data.text.length, 'ตัวอักษร')
+    } catch (error: unknown) {
+      console.error('Error uploading file:', error)
+      if (error instanceof Error) {
+        alert(error.message) // แจ้งเตือนผู้ใช้ถ้าพัง (เช่น ติดรหัสผ่าน)
+      }
+      setSelectedFile(null) // Reset ไฟล์
+    } finally {
+      setIsExtracting(false)
     }
   }
 
@@ -215,11 +253,16 @@ export default function ChatPage() {
         )}
         <div className='flex items-center gap-2'>
           <FileUpload
-            onFileSelect={(file) => setSelectedFile(file)}
-            disabled={isLoading}
+            onFileSelect={handleFileUpload}
+            disabled={isLoading || isExtracting}
           />
-          {/* <form> ... ช่องพิมพ์แชทของคุณ ... </form> */}
         </div>
+        {/* UI แจ้งสถานะตอนกำลังอ่านไฟล์ (ใส่ไว้ข้างๆ หรือล่างไฟล์ที่เลือกก็ได้ครับ) */}
+        {isExtracting && (
+          <span className='animate-pulse text-sm text-gray-500'>
+            กำลังอ่านไฟล์... ⏳
+          </span>
+        )}
         <input
           className='w-full rounded-full border border-gray-300 bg-white p-4 pr-16 text-black shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none'
           value={input}
