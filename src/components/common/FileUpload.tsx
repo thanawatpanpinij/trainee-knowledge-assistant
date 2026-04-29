@@ -43,6 +43,8 @@ export default function FileUpload({
 
     // ถ้าผ่านหมด ให้ส่งไฟล์ออกไปให้ Parent Component จัดการต่อ
     onFileSelect(file)
+
+    e.target.value = ''
   }
 
   return (
