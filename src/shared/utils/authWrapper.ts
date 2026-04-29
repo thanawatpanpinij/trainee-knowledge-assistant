@@ -13,7 +13,7 @@ type AuthenticatedHandler = (
   context: AuthContext
 ) => Promise<Response>
 
-export async function withAuth(handler: AuthenticatedHandler) {
+export function withAuth(handler: AuthenticatedHandler) {
   return async (req: NextRequest, context: Record<string, unknown>) => {
     try {
       const cookieStore = await cookies()
