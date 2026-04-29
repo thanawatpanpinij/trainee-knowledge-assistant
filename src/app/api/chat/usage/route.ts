@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     // 3. ส่งตัวเลขกลับไปให้หน้าบ้าน
     return NextResponse.json({ total: result._sum.tokenUsage || 0 })
   } catch (error) {
-    console.error('Error fetching token usage:', error)
+    console.error('[Token Usage API Error]:', error)
     return NextResponse.json({ total: 0 }, { status: 500 })
   }
 }
