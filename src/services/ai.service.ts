@@ -1,6 +1,6 @@
-import { ChatRequest } from '@/validations/chatSchema'
+import { ChatRequest } from '@shared/validations'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
-import { ENV } from '@config/env'
+import { ENV } from '@shared/config'
 import { ChatRepository } from '@lib/db/chat.repository'
 import { streamText, convertToModelMessages, UIMessage } from 'ai'
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { FileUpload } from '@components/common'
+import { FileUpload } from '@shared/components'
 
 export default function UploadPage() {
   const router = useRouter()

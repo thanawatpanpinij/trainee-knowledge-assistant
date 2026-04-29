@@ -22,13 +22,9 @@
     /* File System Consistency */
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@api/*": ["src/app/api/*"],
-      "@app/*": ["src/app/*"],
-      "@components/*": ["src/components/*"],
-      "@config/*": ["src/config/*"],
       "@lib/*": ["src/lib/*"],
       "@services/*": ["src/services/*"],
-      "@utils/*": ["src/utils/*"],
+      "@shared/*": ["src/shared/*"],
       "@/*": ["src/*"]
     },
     "allowUnusedLabels": false,

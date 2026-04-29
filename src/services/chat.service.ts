@@ -1,4 +1,4 @@
-import { ChatRequest } from '../validations/chatSchema'
+import { ChatRequest } from '../shared/validations/chatSchema'
 import { ChatRepository } from '@lib/db/chat.repository'
 import { UIMessage } from 'ai'
 

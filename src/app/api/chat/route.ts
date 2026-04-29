@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth } from '@utils/authWrapper'
+import { withAuth } from '@shared/utils'
 import { ChatService } from '@services/chat.service'
-import { AIService } from '@/services/ai.service'
-import { chatRequestSchema } from '@/validations/chatSchema'
+import { AIService } from '@services/ai.service'
+import { chatRequestSchema } from '@shared/validations'
 
 export const maxDuration = 15
 

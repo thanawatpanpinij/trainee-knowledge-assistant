@@ -1,4 +1,4 @@
-import { ENV } from '@config/env'
+import { ENV } from '@shared/config'
 import { PrismaLibSql } from '@prisma/adapter-libsql'
 import { PrismaClient } from 'generated/prisma/client'
 

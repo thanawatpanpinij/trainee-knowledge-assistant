@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
-import { getJwtSecretKey } from '@utils/jwt'
+import { getJwtSecretKey } from '@shared/utils/jwt'
 
 export async function proxy(request: NextRequest) {
   const token = request.cookies.get('auth_token')?.value
