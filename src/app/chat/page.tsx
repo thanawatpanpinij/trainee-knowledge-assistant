@@ -4,6 +4,7 @@ import { SubmitEvent, useEffect, useRef, useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { useRouter } from 'next/navigation'
+import { AppMarkdown } from '@shared/components'
 
 function getSessionValue(key: string): string {
   if (typeof window === 'undefined') return '' // กันพังตอนทำ SSR
@@ -176,12 +177,15 @@ export default function ChatPage() {
                   {m.role === 'user' ? 'You' : 'AI'}
                 </div>
                 {/* ถ้ามี Bonus Markdown Rendering จะเอา ReactMarkdown มาครอบตรงนี้ทีหลังครับ */}
-                <div className='leading-relaxed whitespace-pre-wrap'>
+                <div>
                   {m.parts &&
                     m.parts.length > 0 &&
-                    m.parts.map((p) => {
+                    m.parts.map((p, i) => {
                       if (p.type === 'text') {
-                        return p.text
+                        if (m.role === 'user') return p.text
+                        return (
+                          <AppMarkdown key={`${m.id}-${i}`} content={p.text} />
+                        )
                       }
                       return null
                     })}

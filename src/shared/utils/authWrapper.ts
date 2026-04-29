@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
-import { getJwtSecretKey } from '@shared/utils'
+import { getJwtSecretKey } from '@shared/utils/jwt'
 
 type AuthContext = {
   userId: string
