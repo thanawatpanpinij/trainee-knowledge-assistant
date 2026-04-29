@@ -4,6 +4,7 @@ import { SubmitEvent, useEffect, useRef, useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { useRouter } from 'next/navigation'
+import { FileUpload } from '@components/common'
 
 export default function ChatPage() {
   const router = useRouter()
@@ -11,6 +12,7 @@ export default function ChatPage() {
   const [input, setInput] = useState('')
   const [chatId, setChatId] = useState<string | null>(null)
   const [totalTokens, setTotalTokens] = useState<number>(0)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
@@ -200,6 +202,24 @@ export default function ChatPage() {
         onSubmit={handleSubmit}
         className='relative mt-auto flex items-center'
       >
+        {selectedFile && (
+          <div className='mb-2 inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-700'>
+            <span>📄 {selectedFile.name}</span>
+            <button
+              onClick={() => setSelectedFile(null)}
+              className='text-blue-500 hover:text-red-500'
+            >
+              ✕
+            </button>
+          </div>
+        )}
+        <div className='flex items-center gap-2'>
+          <FileUpload
+            onFileSelect={(file) => setSelectedFile(file)}
+            disabled={isLoading}
+          />
+          {/* <form> ... ช่องพิมพ์แชทของคุณ ... </form> */}
+        </div>
         <input
           className='w-full rounded-full border border-gray-300 bg-white p-4 pr-16 text-black shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none'
           value={input}
