@@ -1,0 +1,21 @@
+services:
+  web:
+    build: .
+    container_name: nextjs-chat-app
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./dev.db:/app/dev.db
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:./dev.db
+    env_file:
+      - .env
+      - .env.local
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
