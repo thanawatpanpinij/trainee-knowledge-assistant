@@ -36,9 +36,25 @@ docker compose up
 
 ## Features Done
 
-- [x] Login + Protected Routes
-- [x] File Upload
-- [ ] RAG (not done yet)
+### Required Features
+
+1.  [x] Login + Protected Routes
+2.  [x] Upload File (PDF, TXT)
+3.  [x] Chat with AI (basic)
+4.  [x] Chat with Uploaded File Context
+5.  [x] Token Usage Counter
+
+### Bonus Features
+
+A. [x] Markdown rendering
+B. [ ] Citation
+C. [x] Streaming response
+D. [ ] RAG with Vector DB (chunking + embedding + retrieval)
+E. [x] Conversation history (save/load)
+F. [ ] Rate limiting / API key rotation
+G1. [x] Docker Compose (Single-command deployment)
+G2. [ ] Docker Healthcheck
+H. [ ] Unit tests (coverage ≥ 40%)
 
 ## Architecture
 
@@ -52,4 +68,6 @@ docker compose up
 
 ## Known Issues
 
-[things you know are not great yet]
+- **ปัญหาด้านประสิทธิภาพในการโหลดประวัติการสนทนา (Chat History Performance):** ในปัจจุบัน ระบบจะดึงข้อมูลและแสดงผลประวัติการแชตทั้งหมดมาในครั้งเดียว (Fetch all at once) หากผู้ใช้งานมีประวัติการสนทนาที่ยาวมาก การไม่มีระบบแบ่งหน้า (Pagination) หรือการเลื่อนโหลด (Infinite Scroll) อาจส่งผลให้หน้าเว็บโหลดช้าลง หรือเกิดอาการ UI กระตุก/ค้างได้ เนื่องจากเบราว์เซอร์ต้องเรนเดอร์ DOM elements จำนวนมหาศาลพร้อมกัน
+- **First Message Interruption on New Chat:** เมื่อเริ่มต้นสร้างการสนทนาใหม่ (New Chat) และกดส่งข้อความแรก ระบบจะทำการสร้าง `chatId` และ Redirect ผู้ใช้ไปยังหน้า Dynamic Route ของแชตนั้นๆ ทันที กระบวนการ Redirect นี้ทำให้เกิดการตัดการเชื่อมต่อ (Interrupt/Abort) ของ AI Response Stream ส่งผลให้คำตอบของ AI ถูกยกเลิกกลางคัน ทำให้ผู้ใช้ต้องพิมพ์ข้อความ และกดส่งใหม่เพื่อเริ่มสนทนากับ AI
+- **UI/UX Glitches & Unpolished Design:** ต้องยอมรับตามตรงว่าในส่วนของการแสดงผล (UI) ยังมี Visual Bugs หรือจุดที่ทำงานได้ไม่สมบูรณ์/ไม่เรียบร้อยอยู่บ้างครับ เนื่องด้วยข้อจำกัดด้านเวลา ผมจึงตัดสินใจทำ Trade-off โดยเลือกปล่อยผ่านปัญหาด้านการแสดงผลเหล่านี้ไปก่อน เพื่อนำเวลาไปโฟกัสกับการทำให้ Core Features, ระบบหลังบ้าน, และการเชื่อมต่อ AI ทำงานได้อย่างถูกต้องและเสถียรที่สุดครับ
