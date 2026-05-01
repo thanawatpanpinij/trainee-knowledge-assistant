@@ -38,23 +38,22 @@ docker compose up
 
 ### Required Features
 
-1.  [x] Login + Protected Routes
-2.  [x] Upload File (PDF, TXT)
-3.  [x] Chat with AI (basic)
-4.  [x] Chat with Uploaded File Context
-5.  [x] Token Usage Counter
+- [x] Login + Protected Routes
+- [x] Upload File (PDF, TXT)
+- [x] Chat with AI (basic)
+- [x] Chat with Uploaded File Context
+- [x] Token Usage Counter
 
 ### Bonus Features
 
-A. [x] Markdown rendering
-B. [ ] Citation
-C. [x] Streaming response
-D. [ ] RAG with Vector DB (chunking + embedding + retrieval)
-E. [x] Conversation history (save/load)
-F. [ ] Rate limiting / API key rotation
-G1. [x] Docker Compose (Single-command deployment)
-G2. [ ] Docker Healthcheck
-H. [ ] Unit tests (coverage ≥ 40%)
+- [x] Markdown rendering
+- [ ] Citation
+- [x] Streaming response
+- [ ] RAG with Vector DB (chunking + embedding + retrieval)
+- [x] Conversation history (save/load)
+- [ ] Rate limiting / API key rotation
+- [x] Docker (Compose + Healthcheck)
+- [ ] Unit tests (coverage ≥ 40%)
 
 ## Architecture
 
