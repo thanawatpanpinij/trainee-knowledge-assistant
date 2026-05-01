@@ -1,5 +1,5 @@
 import { ChatRequest } from '../shared/validations/chatSchema'
-import { ChatRepository } from '@lib/db/chat.repository'
+import { ChatRepository } from '@infrastructure/db/chat.repository'
 import { UIMessage } from 'ai'
 
 interface ensureChatAndSaveMessageParam {

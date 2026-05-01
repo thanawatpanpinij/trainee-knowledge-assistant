@@ -18,7 +18,7 @@ project-root/
 │   │   ├── login/          # Authentication page
 │   │   ├── globals.css     # Global stylesheet
 │   │   └── layout.tsx      # Root layout
-│   ├── lib/                # SERVER-ONLY: 3rd-party wrappers and infrastructure
+│   ├── infrastructure/     # SERVER-ONLY: External connections, databases, and 3rd-party wrappers
 │   │   ├── db/             # Database connection and schema definitions (SQLite)
 │   │   └── vector/         # Vector database client and RAG operations (Chroma DB)
 │   ├── services/           # Core business logic
@@ -43,10 +43,10 @@ When writing or modifying code for this project, the AI must follow these core p
 - Files in `src/app/` (Pages and API Routes) must act ONLY as controllers. They should handle HTTP requests/responses, routing, and basic validation.
 - All heavy lifting, data processing, and business logic MUST be extracted and placed into appropriate functions within `src/services/`.
 
-### 2. The shared/ vs lib/ Distinction (Strict Boundary):
+### 2. The `shared/` vs `infrastructure/` Distinction (Strict Boundary):
 
 - Use `src/shared/` for code that is safe to be executed on both Client and Server (e.g., UI components, Zod validation schemas, pure utility functions).
-- Use `src/lib/` exclusively for Server-Only infrastructure, such as wrapping third-party services, database connections (SQLite), and Vector DB clients (Chroma DB). Never import from `lib/` into a Client Component.
+- Use `src/infrastructure/` exclusively for Server-Only infrastructure, such as wrapping third-party services, database connections (SQLite), and Vector DB clients (Chroma DB). Never import from `infrastructure/` into a Client Component.
 
 ### 3. Fail-Fast Environment Validation:
 

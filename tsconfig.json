@@ -22,7 +22,7 @@
     /* File System Consistency */
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@lib/*": ["src/lib/*"],
+      "@infrastructure/*": ["src/infrastructure/*"],
       "@services/*": ["src/services/*"],
       "@shared/*": ["src/shared/*"],
       "@/*": ["src/*"]

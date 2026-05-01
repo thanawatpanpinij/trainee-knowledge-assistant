@@ -1,6 +1,6 @@
 import { SignJWT } from 'jose'
 import bcrypt from 'bcryptjs'
-import prisma from '@lib/db/prisma'
+import prisma from '@infrastructure/db/prisma'
 import { getJwtSecretKey } from '@shared/utils/auth'
 
 export const authService = {

@@ -3,7 +3,7 @@ import { withAuth } from '@shared/utils/auth'
 import { ChatService } from '@services/chat.service'
 import { AIService } from '@services/ai.service'
 import { chatRequestSchema } from '@shared/validations'
-import { ChatRepository } from '@lib/db/chat.repository'
+import { ChatRepository } from '@infrastructure/db/chat.repository'
 
 export const maxDuration = 15
 

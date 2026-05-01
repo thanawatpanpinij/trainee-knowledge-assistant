@@ -1,7 +1,7 @@
 import { ChatRequest } from '@shared/validations'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { ENV } from '@shared/config'
-import { ChatRepository } from '@lib/db/chat.repository'
+import { ChatRepository } from '@infrastructure/db/chat.repository'
 import { streamText, convertToModelMessages, UIMessage } from 'ai'
 
 const google = createGoogleGenerativeAI({
