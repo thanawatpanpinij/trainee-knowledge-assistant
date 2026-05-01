@@ -37,7 +37,7 @@ export default function ChatSidebar() {
   return (
     <div className='flex h-full flex-col'>
       {/* ปุ่มสร้างแชตใหม่ */}
-      <div className='p-4'>
+      <div className='space-y-2 p-4'>
         <Link
           href='/chat'
           className='flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700'
@@ -50,6 +50,19 @@ export default function ChatSidebar() {
             />
           </svg>
           แชตใหม่
+        </Link>
+        <Link
+          href='/upload'
+          className='flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50'
+        >
+          <svg className='h-5 w-5' viewBox='0 0 20 20' fill='currentColor'>
+            <path
+              fillRule='evenodd'
+              d='M3 14a1 1 0 011-1h3a1 1 0 110 2H4a1 1 0 01-1-1zm6 0a1 1 0 011-1h6a1 1 0 110 2h-6a1 1 0 01-1-1zM9.293 6.707a1 1 0 011.414 0L12 8V3a1 1 0 112 0v5l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z'
+              clipRule='evenodd'
+            />
+          </svg>
+          อัปโหลดไฟล์
         </Link>
       </div>
 

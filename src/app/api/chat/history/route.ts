@@ -1,6 +1,6 @@
 // src/app/api/chat/history/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth } from '@shared/utils/authWrapper'
+import { withAuth } from '@shared/utils/auth'
 import { ChatService } from '@/services/chat.service'
 
 export const GET = withAuth(async (req: NextRequest, { userId }) => {

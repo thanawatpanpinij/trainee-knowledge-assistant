@@ -1,23 +1,23 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { jwtVerify } from 'jose'
-import { getJwtSecretKey } from '@shared/utils/jwt'
+import { getAuthResult } from '@shared/utils/auth'
 
 export async function proxy(request: NextRequest) {
-  const token = request.cookies.get('auth_token')?.value
-  if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  const pathname = request.nextUrl.pathname
+  const auth = await getAuthResult(request)
+  const loginUrl = new URL('/login', request.url)
+
+  if (!auth.authenticated) {
+    return NextResponse.redirect(loginUrl)
   }
 
-  try {
-    await jwtVerify(token, getJwtSecretKey())
-    return NextResponse.next()
-  } catch (error) {
-    console.error('Proxy auth failed:', error)
-    return NextResponse.redirect(new URL('/login', request.url))
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL('/chat', request.url))
   }
+
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/chat/:path*', '/upload/:path*'],
+  matcher: ['/', '/chat/:path*', '/upload/:path*'],
 }

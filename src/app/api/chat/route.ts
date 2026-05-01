@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth } from '@shared/utils/authWrapper'
+import { withAuth } from '@shared/utils/auth'
 import { ChatService } from '@services/chat.service'
 import { AIService } from '@services/ai.service'
 import { chatRequestSchema } from '@shared/validations'
