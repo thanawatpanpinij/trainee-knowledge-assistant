@@ -33,8 +33,6 @@ export default function UploadPage() {
       sessionStorage.setItem('fileContext', data.text)
       sessionStorage.setItem('fileName', file.name)
 
-      console.log('✅ สกัดข้อความสำเร็จ พาผู้ใช้ไปยังหน้า Chat...')
-
       // อัปโหลดสำเร็จ นำทางไปหน้าแชททันที
       router.push('/chat')
     } catch (error: unknown) {

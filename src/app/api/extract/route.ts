@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { CanvasFactory } from 'pdf-parse/worker'
 import { PasswordException, PDFParse } from 'pdf-parse'
 
 export async function POST(req: Request) {
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
 
       // 2. ปรับวิธีการเรียกใช้ตาม Document v2/v3
       // ส่ง buffer เข้าไปผ่าน property 'data'
-      const parser = new PDFParse({ data: buffer })
+      const parser = new PDFParse({ data: buffer, CanvasFactory })
 
       // 🌟 เพิ่ม try...catch...finally เฉพาะสำหรับการอ่าน PDF
       try {

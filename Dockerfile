@@ -30,6 +30,11 @@ COPY --from=builder /app/node_modules/dotenv ./node_modules/dotenv
 COPY --from=builder /app/node_modules/bcryptjs ./node_modules/bcryptjs
 COPY --from=builder /app/node_modules/async-mutex ./node_modules/async-mutex
 
+# PDF extraction (pdf-parse -> pdfjs-dist + @napi-rs/canvas) สำหรับ standalone runtime
+COPY --from=builder /app/node_modules/pdf-parse ./node_modules/pdf-parse
+COPY --from=builder /app/node_modules/pdfjs-dist ./node_modules/pdfjs-dist
+COPY --from=builder /app/node_modules/@napi-rs ./node_modules/@napi-rs
+
 # Copy Prisma CLI และ dependencies ที่จำเป็น
 COPY --from=builder /app/generated ./generated
 COPY --from=builder /app/prisma ./prisma
